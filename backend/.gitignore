@@ -1,0 +1,63 @@
+
+# Dependencies
+node_modules/
+
+
+
+# Environment Variables
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+
+# Build / Output
+dist/
+build/
+out/
+
+
+# Prisma
+prisma/migrations/**/migration_lock.toml
+prisma/*.db
+prisma/*.db-journal
+*.db
+*.db-journal
+
+
+# OS Files
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+
+
+# IDE / Editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+
+# Coverage & Testin
+coverage/
+.nyc_output/
+
+
+# Misc
+*.tgz
+.cache/
+tmp/
+temp/
+/generated/prisma
