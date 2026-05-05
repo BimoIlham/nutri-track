@@ -1,0 +1,1 @@
+[x] setup auth system with prisma and jwt
