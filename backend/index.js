@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 
 const authRoutes = require('./src/routes/authRoutes');
+const profileRoutes = require('./src/routes/profileRoutes');
 const errorHandler = require('./src/middleware/errorHandler');
 
 const app = express();
@@ -15,7 +16,8 @@ app.use(cors({
 app.use(express.json()); 
 
 // Memetakan endpoint API ke fungsi controller yang sesuai
-app.use('/api/auth', authRoutes); 
+app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
 
 
 app.get('/', (req, res) => {
