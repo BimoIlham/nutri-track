@@ -20,11 +20,8 @@ export default function CheckObesity() {
     setResult(null);
 
     try {
-      // The ML backend expects Height in meters, but we collect it in cm
+      // Height dikirim dalam cm langsung, backend yang handle transformasi ke ML API
       const payload = { ...formData };
-      if (payload.Height) {
-        payload.Height = Number(payload.Height) / 100;
-      }
 
       let predictionData;
       try {
