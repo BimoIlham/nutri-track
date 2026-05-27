@@ -4,10 +4,12 @@ const cors = require('cors');
 
 const authRoutes = require('./src/routes/authRoutes');
 const profileRoutes = require('./src/routes/profileRoutes');
+const obesityRoutes = require('./src/routes/obesityRoutes');
+const { healthCheck } = require('./src/controllers/obesityController');
 const errorHandler = require('./src/middleware/errorHandler');
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 // Mengizinkan akses dari domain frontend (Vite)
 app.use(cors({
@@ -18,7 +20,9 @@ app.use(express.json());
 // Memetakan endpoint API ke fungsi controller yang sesuai
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/obesity', obesityRoutes);
 
+app.get('/api/health', healthCheck);
 
 app.get('/', (req, res) => {
   res.send('NutriTrack API is running');

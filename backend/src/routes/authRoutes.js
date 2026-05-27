@@ -1,10 +1,12 @@
 const express = require('express');
 const { register, login } = require('../controllers/authController');
+const { getProfile } = require('../controllers/profileController');
+const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
 
-// Memetakan endpoint API ke fungsi controller yang sesuai
 router.post('/register', register);
 router.post('/login', login);
+router.get('/profile', authMiddleware, getProfile);
 
 module.exports = router;

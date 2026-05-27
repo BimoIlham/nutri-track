@@ -45,55 +45,31 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // ── Login (MOCKED FOR TESTING) ──
+  // ── Login ──
   const login = useCallback(async (email, password) => {
     try {
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      if (!email || !password) {
-        throw new Error('Email dan password wajib diisi');
-      }
-
-      const token = 'mock_jwt_token_123';
-      const userData = {
-        id: 1,
-        name: email.split('@')[0],
-        email: email,
-      };
-
-      localStorage.setItem('nutritrack_token', token);
-      localStorage.setItem('nutritrack_user', JSON.stringify(userData));
-      setUser(userData);
-      return userData;
+      const { data } = await api.post('/auth/login', { email, password });
+      localStorage.setItem('nutritrack_token', data.token);
+      localStorage.setItem('nutritrack_user', JSON.stringify(data.user));
+      setUser(data.user);
+      return data.user;
     } catch (error) {
-      throw new Error(error.message || 'Login gagal. Periksa email dan password.');
+      const msg = error.response?.data?.message || 'Login gagal. Periksa email dan password.';
+      throw new Error(msg);
     }
   }, []);
 
-  // ── Register (MOCKED FOR TESTING) ──
+  // ── Register ──
   const register = useCallback(async (formData) => {
     try {
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      if (!formData.email || !formData.password || !formData.name) {
-        throw new Error('Semua kolom wajib diisi');
-      }
-
-      const token = 'mock_jwt_token_123';
-      const userData = {
-        id: 1,
-        name: formData.name,
-        email: formData.email,
-      };
-
-      localStorage.setItem('nutritrack_token', token);
-      localStorage.setItem('nutritrack_user', JSON.stringify(userData));
-      setUser(userData);
-      return userData;
+      const { data } = await api.post('/auth/register', formData);
+      localStorage.setItem('nutritrack_token', data.token);
+      localStorage.setItem('nutritrack_user', JSON.stringify(data.user));
+      setUser(data.user);
+      return data.user;
     } catch (error) {
-      throw new Error(error.message || 'Registrasi gagal. Coba lagi.');
+      const msg = error.response?.data?.message || 'Registrasi gagal. Coba lagi.';
+      throw new Error(msg);
     }
   }, []);
 
@@ -104,20 +80,16 @@ export function AuthProvider({ children }) {
     setUser(null);
   }, []);
 
-  // ── Update Profile (MOCKED FOR TESTING) ──
+  // ── Update Profile ──
   const updateProfile = useCallback(async (updatedData) => {
     try {
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-
-      setUser((prevUser) => {
-        const newUser = { ...prevUser, ...updatedData };
-        localStorage.setItem('nutritrack_user', JSON.stringify(newUser));
-        return newUser;
-      });
-      return true;
+      const { data } = await api.patch('/profile', updatedData);
+      setUser(data.user);
+      localStorage.setItem('nutritrack_user', JSON.stringify(data.user));
+      return data.user;
     } catch (error) {
-      throw new Error(error.message || 'Gagal memperbarui profil.');
+      const msg = error.response?.data?.message || 'Gagal memperbarui profil.';
+      throw new Error(msg);
     }
   }, []);
 
