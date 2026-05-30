@@ -47,8 +47,16 @@ export default function Register() {
     setGlobalError('');
     setLoading(true);
     try {
-      const { confirmPassword, ...payload } = formData;
-      await register({ ...payload, age: Number(payload.age), weight: Number(payload.weight), height: Number(payload.height) });
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        age: Number(formData.age),
+        gender: formData.gender,
+        weight: Number(formData.weight),
+        height: Number(formData.height),
+      };
+      await register(payload);
       navigate('/');
     } catch (err) { 
       setGlobalError(err.message); 

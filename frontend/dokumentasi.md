@@ -1,95 +1,179 @@
-# 🍏 NutriTrack - Dokumentasi Proyek
+# NutriTrack - Dokumentasi Frontend
 
-Dokumentasi ini dibuat untuk memudahkan tim (khususnya *Frontend* dan *Backend* developer) dalam memahami arsitektur, alur fitur, dan *tech stack* yang digunakan dalam proyek **NutriTrack**.
+Dokumen ini menjelaskan kondisi frontend NutriTrack saat ini, cara frontend terhubung ke backend, dan endpoint yang dipakai aplikasi.
 
----
-
-## 🏗️ Struktur Proyek (Monorepo)
-
-Saat ini proyek diatur menggunakan struktur *monorepo* sederhana:
+## Struktur Proyek
 
 ```text
 nutri-track/
-├── frontend/     # Aplikasi React (Vite)
-├── backend/      # (Akan dibuat oleh tim Backend)
-└── dokumentasi.md
+|-- frontend/     # Aplikasi React + Vite
+`-- backend/      # API Express + Prisma + PostgreSQL
 ```
 
----
+## Tech Stack Frontend
 
-## 🛠️ Tech Stack Frontend
+- React 19 + Vite
+- Tailwind CSS v4
+- React Router DOM
+- Axios untuk HTTP client
+- Recharts untuk grafik probabilitas prediksi
+- React Icons untuk ikon UI
 
-Bagian frontend dibangun menggunakan teknologi modern yang fokus pada performa dan UI yang interaktif:
-- **Framework**: React 19 + Vite
-- **Styling**: Tailwind CSS v4 (Desain minimalis dengan tema *emerald/white*)
-- **Routing**: React Router DOM (Client-side routing)
-- **HTTP Client**: Axios (dengan *interceptors* untuk token JWT)
-- **Data Visualization**: Recharts (Untuk grafik probabilitas obesitas)
-- **Icons**: React Icons
+## Struktur Direktori Frontend
 
----
+```text
+frontend/src/
+|-- components/
+|   |-- common/      # Navbar, Footer, Button, Input, AlertModal, ProtectedRoute
+|   `-- specific/    # ObesityForm, ObesityChart, ResultCard
+|-- contexts/        # AuthContext
+|-- data/            # recommendationData
+|-- hooks/           # Custom hooks
+|-- pages/           # Home, Login, Register, Profile, CheckObesity
+`-- services/        # api.js
+```
 
-## 📂 Struktur Direktori Frontend (`frontend/src/`)
+## Environment Frontend
 
-- `pages/`: Berisi halaman utama aplikasi (`Home.jsx`, `Login.jsx`, `Register.jsx`, `CheckObesity.jsx`, `Profile.jsx`).
-- `components/`: 
-  - `common/`: Komponen yang dipakai berulang (Navbar, Footer, Button, Input, AlertModal, ProtectedRoute).
-  - `specific/`: Komponen spesifik fitur (ObesityForm, ObesityChart, ResultCard).
-- `contexts/`: Manajemen *state* global, saat ini menggunakan `AuthContext.jsx` untuk menyimpan data user dan token login.
-- `services/`: Konfigurasi komunikasi ke backend (`api.js`).
-- `data/`: Data statis atau konstanta (jika ada).
-- `hooks/`: Custom React Hooks.
+Frontend membaca alamat backend dari `frontend/.env`.
 
----
+```env
+VITE_API_BASE_URL=http://localhost:3001/api
+```
 
-## 🔄 Alur Fitur Utama (Cek Obesitas)
+Jika env tidak tersedia, `src/services/api.js` memakai fallback:
 
-Fitur utama aplikasi ini adalah memprediksi tingkat obesitas pengguna menggunakan model *Machine Learning* di backend. Berikut adalah alur data dari Frontend ke Backend:
+```js
+http://localhost:3001/api
+```
 
-1. **Input User**: Pengguna mengisi form di halaman `/check-obesity` (menggunakan komponen `ObesityForm.jsx`). Data yang diisi mencakup:
-   - Berat Badan (kg)
-   - Tinggi Badan (cm) -> *Frontend otomatis mengubahnya ke satuan Meter (m) sebelum dikirim ke backend.*
-   - Fitur-fitur kebiasaan gaya hidup lainnya (seperti *family history*, *FAVC*, *FCVC*, *NCP*, *SMOKE*, dll).
-2. **Proses Request**: Saat disubmit, Frontend (melalui `api.js`) mengirimkan request `POST` ke endpoint `/obesity/predict` milik backend dengan menyertakan JWT token di *header*.
-3. **Respons Backend**: Backend diharapkan memproses data melalui model ML dan mengembalikan respons JSON dengan format:
-   ```json
-   {
-     "prediction": "Obesity_Type_I",
-     "probabilities": {
-       "Insufficient_Weight": 0.05,
-       "Normal_Weight": 0.05,
-       "Overweight_Level_I": 0.1,
-       "Overweight_Level_II": 0.05,
-       "Obesity_Type_I": 0.8,
-       "Obesity_Type_II": 0.05,
-       "Obesity_Type_III": 0.0
-     }
-   }
-   ```
-4. **Visualisasi**: 
-   - Komponen `ResultCard.jsx` akan menampilkan teks tingkat obesitas.
-   - Komponen `ObesityChart.jsx` (menggunakan Recharts) akan menampilkan grafik probabilitas untuk setiap kategori.
+Jangan menaruh secret backend seperti `DATABASE_URL`, `JWT_SECRET`, atau credential Supabase di env frontend.
 
----
+## Routing Halaman
 
-## 🔌 Kebutuhan API (Untuk Tim Backend)
+- `/` - Landing page
+- `/login` - Login user
+- `/register` - Registrasi user
+- `/profile` - Profil user dan riwayat prediksi, protected route
+- `/cek-obesitas` - Form prediksi obesitas, protected route
 
-Untuk memastikan frontend dapat berjalan dengan sempurna tanpa menampilkan *mock data*, tim Backend perlu menyiapkan beberapa *endpoint* berikut:
+## Alur Auth
 
-### 1. Authentication
-Frontend menyimpan token menggunakan *Local Storage* dan mengirimkannya sebagai `Bearer Token` di *Authorization Header*.
-- `POST /api/auth/register` : Mendaftarkan user baru.
-- `POST /api/auth/login` : Login dan mengembalikan data user beserta `token` JWT.
+1. User register atau login lewat frontend.
+2. Frontend mengirim request ke backend:
+   - `POST /api/auth/register`
+   - `POST /api/auth/login`
+3. Backend mengembalikan `token` dan data `user`.
+4. Frontend menyimpan token di `localStorage` dengan key `nutritrack_token`.
+5. Axios interceptor di `src/services/api.js` otomatis menambahkan header:
 
-### 2. Prediksi Obesitas
-- `POST /api/obesity/predict` : 
-  - **Request Body**: JSON berisi fitur-fitur kesehatan (termasuk `Weight` dan `Height` dalam meter).
-  - **Response**: JSON berisi `prediction` (string klasifikasi) dan `probabilities` (objek key-value probabilitas).
+```text
+Authorization: Bearer <token>
+```
 
-### 3. (Opsional) Profil User
-- `GET /api/user/profile` : Mengambil data detail user dan *history* pengecekan obesitas untuk ditampilkan di halaman Profile.
+Jika backend mengembalikan status `401`, frontend menghapus token dan mengarahkan user ke `/login`.
 
-> **Catatan untuk Backend**: Pastikan untuk mengaktifkan **CORS (Cross-Origin Resource Sharing)** agar frontend (misal berjalan di `http://localhost:5173`) dapat melakukan request ke server backend (misal `http://localhost:3000`) tanpa diblokir oleh browser. Basis URL backend saat ini diatur di frontend lewat *environment variable* `VITE_API_BASE_URL`.
+## Alur Cek Obesitas
 
----
-*Dokumentasi ini bersifat dinamis dan dapat terus diperbarui seiring berjalannya proses pengembangan proyek.*
+1. User membuka `/cek-obesitas`.
+2. User mengisi 16 field di `ObesityForm.jsx`.
+3. Frontend mengirim data ke:
+
+```text
+POST /api/obesity/predict
+```
+
+4. Tinggi badan dikirim dalam cm, sesuai kontrak backend.
+5. Backend memanggil ML API, menyimpan hasil ke database, lalu mengembalikan hasil prediksi.
+6. Frontend menampilkan:
+   - `prediction`
+   - `label`
+   - `confidence`
+   - `bmi`
+   - `probabilities`
+   - `ai_advice`
+
+Tidak ada mock prediction di frontend. Jika backend atau ML API gagal, frontend menampilkan alert error.
+
+## Validasi Form Obesitas
+
+Range numeric frontend mengikuti validasi backend:
+
+| Field | Range |
+|-------|-------|
+| `Age` | 14-61 tahun |
+| `Height` | 145-198 cm |
+| `Weight` | 39-173 kg |
+| `FCVC` | 1-5 |
+| `NCP` | 1-6 |
+| `CH2O` | 1-5 |
+| `FAF` | 0-7 |
+| `TUE` | 0-12 |
+
+Gender untuk endpoint prediksi memakai:
+
+```text
+Male / Female
+```
+
+Gender untuk profil user tetap memakai:
+
+```text
+L / P
+```
+
+Keduanya sengaja berbeda karena endpoint dan kebutuhan datanya berbeda.
+
+## Endpoint Backend yang Dipakai Frontend
+
+Base URL lokal:
+
+```text
+http://localhost:3001/api
+```
+
+### Auth
+
+- `POST /auth/register` - Register user baru
+- `POST /auth/login` - Login user
+- `GET /auth/profile` - Ambil profil user login
+
+### Profile
+
+- `GET /profile` - Ambil profil user login
+- `PATCH /profile` - Update profil user
+
+### Obesity
+
+- `POST /obesity/predict` - Prediksi tingkat obesitas
+- `GET /obesity/history` - Ambil riwayat prediksi
+- `GET /obesity/history/:id` - Ambil detail prediksi
+- `DELETE /obesity/history/:id` - Hapus prediksi
+
+### Health
+
+- `GET /health` - Cek status API, database, dan ML service
+
+## Cara Menjalankan Lokal
+
+Backend:
+
+```powershell
+cd C:\Code\nutri-track\backend
+docker compose up -d
+npm run dev
+```
+
+Frontend:
+
+```powershell
+cd C:\Code\nutri-track\frontend
+npm run dev
+```
+
+URL lokal:
+
+```text
+Frontend: http://localhost:5173
+Backend:  http://localhost:3001
+```

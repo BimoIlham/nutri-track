@@ -1,37 +1,30 @@
-import { createContext, useState, useEffect, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import api from '../services/api';
+import { AuthContext } from './auth-context';
 
-export const AuthContext = createContext(null);
+function getSavedUser() {
+  const token = localStorage.getItem('nutritrack_token');
+  const savedUser = localStorage.getItem('nutritrack_user');
+
+  if (!token || !savedUser) return null;
+
+  try {
+    return JSON.parse(savedUser);
+  } catch {
+    localStorage.removeItem('nutritrack_user');
+    return null;
+  }
+}
 
 /**
- * AuthProvider — wraps the app to provide authentication state & actions.
- *
- * Exposes:
- *   user, isAuthenticated, loading,
- *   login(), register(), logout(), fetchProfile()
+ * AuthProvider wraps the app to provide authentication state and actions.
  */
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(getSavedUser);
 
   const isAuthenticated = !!user;
+  const loading = false;
 
-  // ── Bootstrap: restore session from localStorage on mount ──
-  useEffect(() => {
-    const token = localStorage.getItem('nutritrack_token');
-    const savedUser = localStorage.getItem('nutritrack_user');
-
-    if (token && savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch {
-        localStorage.removeItem('nutritrack_user');
-      }
-    }
-    setLoading(false);
-  }, []);
-
-  // ── Fetch fresh profile from backend ──
   const fetchProfile = useCallback(async () => {
     try {
       const { data } = await api.get('/auth/profile');
@@ -45,7 +38,6 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  // ── Login ──
   const login = useCallback(async (email, password) => {
     try {
       const { data } = await api.post('/auth/login', { email, password });
@@ -55,11 +47,10 @@ export function AuthProvider({ children }) {
       return data.user;
     } catch (error) {
       const msg = error.response?.data?.message || 'Login gagal. Periksa email dan password.';
-      throw new Error(msg);
+      throw new Error(msg, { cause: error });
     }
   }, []);
 
-  // ── Register ──
   const register = useCallback(async (formData) => {
     try {
       const { data } = await api.post('/auth/register', formData);
@@ -69,18 +60,16 @@ export function AuthProvider({ children }) {
       return data.user;
     } catch (error) {
       const msg = error.response?.data?.message || 'Registrasi gagal. Coba lagi.';
-      throw new Error(msg);
+      throw new Error(msg, { cause: error });
     }
   }, []);
 
-  // ── Logout ──
   const logout = useCallback(() => {
     localStorage.removeItem('nutritrack_token');
     localStorage.removeItem('nutritrack_user');
     setUser(null);
   }, []);
 
-  // ── Update Profile ──
   const updateProfile = useCallback(async (updatedData) => {
     try {
       const { data } = await api.patch('/profile', updatedData);
@@ -89,7 +78,7 @@ export function AuthProvider({ children }) {
       return data.user;
     } catch (error) {
       const msg = error.response?.data?.message || 'Gagal memperbarui profil.';
-      throw new Error(msg);
+      throw new Error(msg, { cause: error });
     }
   }, []);
 

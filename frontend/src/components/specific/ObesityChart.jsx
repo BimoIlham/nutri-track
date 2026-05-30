@@ -2,23 +2,18 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Cell,
 } from 'recharts';
+import { FiBarChart2 } from 'react-icons/fi';
 
-/**
- * Color mapping for obesity classes — green ▸ yellow ▸ orange ▸ red
- */
 const CLASS_COLORS = {
-  Insufficient_Weight: '#0ea5e9', // sky-500
-  Normal_Weight: '#10b981', // emerald-500
-  Overweight_Level_I: '#f59e0b', // amber-500
-  Overweight_Level_II: '#f97316', // orange-500
-  Obesity_Type_I: '#ef4444', // red-500
-  Obesity_Type_II: '#dc2626', // red-600
-  Obesity_Type_III: '#b91c1c', // red-700
+  Insufficient_Weight: '#0ea5e9',
+  Normal_Weight: '#10b981',
+  Overweight_Level_I: '#f59e0b',
+  Overweight_Level_II: '#f97316',
+  Obesity_Type_I: '#ef4444',
+  Obesity_Type_II: '#dc2626',
+  Obesity_Type_III: '#b91c1c',
 };
 
-/**
- * Short labels for chart readability.
- */
 const SHORT_LABELS = {
   Insufficient_Weight: 'Kurang',
   Normal_Weight: 'Normal',
@@ -29,26 +24,18 @@ const SHORT_LABELS = {
   Obesity_Type_III: 'Obesitas III',
 };
 
-/**
- * Custom tooltip for the bar chart.
- */
 function CustomTooltip({ active, payload }) {
   if (!active || !payload?.length) return null;
   const { fullName, probability } = payload[0].payload;
 
   return (
-    <div className="bg-emerald-950 text-white px-4 py-3 rounded-xl text-sm shadow-xl border border-emerald-800">
+    <div className="bg-slate-950 text-white px-4 py-3 rounded-xl text-sm shadow-xl border border-slate-800">
       <p className="font-bold">{fullName}</p>
-      <p className="text-teal-400 mt-1 text-base font-black">{(probability * 100).toFixed(1)}%</p>
+      <p className="text-teal-300 mt-1 text-base font-black">{(probability * 100).toFixed(1)}%</p>
     </div>
   );
 }
 
-/**
- * ObesityChart — Bar chart showing probability distribution across all obesity classes.
- *
- * @param {Object} probabilities — key-value map { className: probability (0-1) }
- */
 export default function ObesityChart({ probabilities }) {
   if (!probabilities || Object.keys(probabilities).length === 0) return null;
 
@@ -60,18 +47,26 @@ export default function ObesityChart({ probabilities }) {
   }));
 
   return (
-    <div className="bg-white rounded-3xl shadow-2xl shadow-emerald-900/5 border border-emerald-100 p-6 sm:p-10 animate-slide-up">
-      <h3 className="text-2xl font-black text-emerald-950 mb-2">📊 Distribusi Probabilitas</h3>
-      <p className="text-emerald-800/80 text-base mb-8 font-medium">Probabilitas untuk setiap kelas obesitas berdasarkan data Anda.</p>
+    <div className="rounded-2xl border border-slate-200 bg-white p-6 sm:p-8 shadow-sm animate-slide-up">
+      <div className="mb-8 flex items-start gap-3">
+        <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center shrink-0">
+          <FiBarChart2 className="w-6 h-6 text-teal-700" />
+        </div>
+        <div>
+          <p className="text-xs uppercase tracking-wider font-bold text-slate-500">Probabilitas</p>
+          <h3 className="text-2xl font-black text-slate-950">Distribusi Kelas</h3>
+          <p className="mt-1 text-slate-600 text-base font-medium">Peluang tiap kategori.</p>
+        </div>
+      </div>
 
       <div className="w-full h-[350px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#ecfdf5" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
             <XAxis
               dataKey="name"
-              tick={{ fontSize: 12, fill: '#064e3b', fontWeight: 600 }}
-              axisLine={{ stroke: '#d1fae5' }}
+              tick={{ fontSize: 12, fill: '#334155', fontWeight: 600 }}
+              axisLine={{ stroke: '#cbd5e1' }}
               tickLine={false}
               interval={0}
               angle={-25}
@@ -79,13 +74,13 @@ export default function ObesityChart({ probabilities }) {
               height={60}
             />
             <YAxis
-              tick={{ fontSize: 13, fill: '#064e3b', fontWeight: 600 }}
-              axisLine={{ stroke: '#d1fae5' }}
+              tick={{ fontSize: 13, fill: '#334155', fontWeight: 600 }}
+              axisLine={{ stroke: '#cbd5e1' }}
               tickLine={false}
               tickFormatter={(v) => `${(v * 100).toFixed(0)}%`}
               domain={[0, 1]}
             />
-            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(16, 185, 129, 0.05)' }} />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(15, 23, 42, 0.04)' }} />
             <Bar dataKey="probability" radius={[8, 8, 0, 0]} maxBarSize={64}>
               {chartData.map((entry, index) => (
                 <Cell key={index} fill={entry.color} />
