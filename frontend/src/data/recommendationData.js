@@ -1,12 +1,12 @@
 export const obesityData = {
     'Insufficient_Weight': {
-        'status'    : '⚠️ Berat Badan Kurang',
+        'status'    : 'Berat Badan Kurang',
         'deskripsi' : 'Berat badanmu berada di bawah batas normal. Tubuh membutuhkan lebih banyak nutrisi.',
         'diet'      : [
-            'Tambah asupan kalori 300–500 kkal/hari dari sumber sehat',
+            'Tambah asupan kalori 300-500 kkal/hari dari sumber sehat',
             'Perbanyak konsumsi protein: telur, ayam, ikan, kacang-kacangan',
             'Konsumsi karbohidrat kompleks: nasi merah, oat, ubi',
-            'Makan 5–6 kali sehari dalam porsi lebih kecil tapi sering',
+            'Makan 5-6 kali sehari dalam porsi lebih kecil tapi sering',
             'Tambahkan lemak sehat: alpukat, kacang almond, minyak zaitun',
         ],
         'olahraga'  : [
@@ -21,7 +21,7 @@ export const obesityData = {
         ]
     },
     'Normal_Weight': {
-        'status'    : '✅ Berat Badan Normal',
+        'status'    : 'Berat Badan Normal',
         'deskripsi' : 'Selamat! Berat badanmu berada di rentang ideal. Pertahankan gaya hidup sehatmu.',
         'diet'      : [
             'Pertahankan pola makan seimbang dengan gizi lengkap',
@@ -31,7 +31,7 @@ export const obesityData = {
             'Jangan skip sarapan untuk menjaga metabolisme',
         ],
         'olahraga'  : [
-            'Olahraga rutin 3–4x seminggu minimal 30 menit',
+            'Olahraga rutin 3-4x seminggu minimal 30 menit',
             'Kombinasikan kardio (lari, renang) dan latihan kekuatan',
             'Tetap aktif bergerak di sela-sela aktivitas harian',
         ],
@@ -41,10 +41,10 @@ export const obesityData = {
         ]
     },
     'Overweight_Level_I': {
-        'status'    : '⚠️ Kelebihan Berat Badan Tingkat I',
+        'status'    : 'Kelebihan Berat Badan Tingkat I',
         'deskripsi' : 'Berat badanmu sedikit di atas normal. Ini saat yang tepat untuk mulai perubahan gaya hidup.',
         'diet'      : [
-            'Kurangi asupan kalori 300–500 kkal/hari secara bertahap',
+            'Kurangi asupan kalori 300-500 kkal/hari secara bertahap',
             'Hindari makanan tinggi gula: minuman manis, kue, permen',
             'Perbanyak sayuran dan protein tanpa lemak',
             'Hindari makan larut malam (setelah pukul 20.00)',
@@ -62,10 +62,10 @@ export const obesityData = {
         ]
     },
     'Overweight_Level_II': {
-        'status'    : '⚠️ Kelebihan Berat Badan Tingkat II',
+        'status'    : 'Kelebihan Berat Badan Tingkat II',
         'deskripsi' : 'Berat badanmu cukup jauh di atas normal. Perubahan gaya hidup serius sangat dianjurkan.',
         'diet'      : [
-            'Kurangi asupan kalori 500–750 kkal/hari dengan panduan ahli gizi',
+            'Kurangi asupan kalori 500-750 kkal/hari dengan panduan ahli gizi',
             'Hindari semua makanan ultra-processed dan fast food',
             'Konsumsi makanan tinggi serat: sayur, buah, biji-bijian',
             'Batasi karbohidrat sederhana, pilih karbohidrat kompleks',
@@ -75,7 +75,7 @@ export const obesityData = {
             'Olahraga 5x seminggu minimal 45 menit per sesi',
             'Kombinasi kardio intensitas sedang dan latihan beban',
             'Pertimbangkan kelas olahraga terpandu (zumba, aerobik)',
-            'Target penurunan berat badan 0.5–1 kg per minggu',
+            'Target penurunan berat badan 0.5-1 kg per minggu',
         ],
         'medis'     : [
             'Wajib konsultasi ke dokter dan ahli gizi',
@@ -84,7 +84,7 @@ export const obesityData = {
         ]
     },
     'Obesity_Type_I': {
-        'status'    : '🔴 Obesitas Tipe I',
+        'status'    : 'Obesitas Tipe I',
         'deskripsi' : 'Kamu mengalami obesitas tingkat pertama. Penanganan segera sangat dianjurkan untuk mencegah komplikasi.',
         'diet'      : [
             'Ikuti program diet terstruktur dengan panduan ahli gizi',
@@ -103,11 +103,11 @@ export const obesityData = {
             'WAJIB konsultasi dokter sebelum memulai program apapun',
             'Periksa risiko diabetes tipe 2, hipertensi, dan penyakit jantung',
             'Pertimbangkan program penurunan berat badan medis terstruktur',
-            'Evaluasi kesehatan mental — stres bisa memperburuk obesitas',
+            'Evaluasi kesehatan mental - stres bisa memperburuk obesitas',
         ]
     },
     'Obesity_Type_II': {
-        'status'    : '🔴 Obesitas Tipe II',
+        'status'    : 'Obesitas Tipe II',
         'deskripsi' : 'Kamu mengalami obesitas tingkat dua. Kondisi ini membutuhkan penanganan medis yang serius.',
         'diet'      : [
             'Diet harus dalam pengawasan ketat dokter dan ahli gizi',
@@ -118,7 +118,7 @@ export const obesityData = {
         ],
         'olahraga'  : [
             'Olahraga HANYA dengan supervisi profesional',
-            'Mulai sangat perlahan: jalan kaki 15–20 menit, tingkatkan bertahap',
+            'Mulai sangat perlahan: jalan kaki 15-20 menit, tingkatkan bertahap',
             'Renang sangat dianjurkan karena minim tekanan pada sendi',
             'Fisioterapi mungkin diperlukan jika ada masalah sendi',
         ],
@@ -127,11 +127,11 @@ export const obesityData = {
             'Evaluasi komplikasi: sleep apnea, diabetes, hipertensi, GERD',
             'Diskusikan kemungkinan terapi medis atau bedah bariatrik',
             'Dukungan psikologis sangat dianjurkan',
-            'Pantau kondisi kesehatan setiap 1–3 bulan',
+            'Pantau kondisi kesehatan setiap 1-3 bulan',
         ]
     },
     'Obesity_Type_III': {
-        'status'    : '🚨 Obesitas Tipe III (Obesitas Morbid)',
+        'status'    : 'Obesitas Tipe III (Obesitas Morbid)',
         'deskripsi' : 'Ini adalah tingkat obesitas paling berat. Intervensi medis segera sangat diperlukan.',
         'diet'      : [
             'Diet HARUS di bawah pengawasan ketat tim medis',
@@ -145,7 +145,7 @@ export const obesityData = {
             'Olahraga dalam air (hidroterapi) bisa menjadi pilihan aman',
         ],
         'medis'     : [
-            'SEGERA temui dokter spesialis — ini kondisi darurat kesehatan',
+            'SEGERA temui dokter spesialis - ini kondisi darurat kesehatan',
             'Evaluasi menyeluruh: jantung, paru, diabetes, kolesterol',
             'Operasi bariatrik (sleeve gastrectomy/bypass lambung) perlu didiskusikan',
             'Dukungan psikiatri/psikologi sangat penting',
@@ -154,3 +154,4 @@ export const obesityData = {
         ]
     }
 };
+

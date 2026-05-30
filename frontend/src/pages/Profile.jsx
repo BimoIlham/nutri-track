@@ -35,13 +35,17 @@ const calculateBMI = (weight, height) => {
   if (!weight || !height) return null;
   const hMeters = height / 100;
   const bmi = weight / (hMeters * hMeters);
-  let status = '';
-  if (bmi < 18.5) status = 'Kurus';
-  else if (bmi < 25) status = 'Normal';
-  else if (bmi < 30) status = 'Berlebih';
-  else status = 'Obesitas';
+  const status = bmi < 18.5 ? 'Kurus' : bmi < 25 ? 'Normal' : bmi < 30 ? 'Berlebih' : 'Obesitas';
   return { value: bmi.toFixed(1), status };
 };
+
+const getProfileForm = (user) => ({
+  name: user?.name || '',
+  age: user?.age || '',
+  gender: user?.gender || '',
+  weight: user?.weight || '',
+  height: user?.height || '',
+});
 
 export default function Profile() {
   const { user, updateProfile } = useAuth();
@@ -50,7 +54,7 @@ export default function Profile() {
 
   // Edit Profile State
   const [isEditing, setIsEditing] = useState(false);
-  const [editForm, setEditForm] = useState({ name: '', age: '', gender: '', weight: '', height: '' });
+  const [editForm, setEditForm] = useState(() => getProfileForm(user));
   const [saving, setSaving] = useState(false);
   const [alert, setAlert] = useState({ isOpen: false, title: '', message: '', type: 'success' });
 
@@ -65,20 +69,13 @@ export default function Profile() {
     fetchHistory();
   }, []);
 
-  useEffect(() => {
-    if (user && !isEditing) {
-      setEditForm({
-        name: user.name || '',
-        age: user.age || '',
-        gender: user.gender || '',
-        weight: user.weight || '',
-        height: user.height || '',
-      });
-    }
-  }, [user, isEditing]);
-
   const handleEditChange = (field) => (e) => {
     setEditForm((prev) => ({ ...prev, [field]: e.target.value }));
+  };
+
+  const handleStartEditing = () => {
+    setEditForm(getProfileForm(user));
+    setIsEditing(true);
   };
 
   const handleSaveProfile = async () => {
@@ -139,7 +136,7 @@ export default function Profile() {
           
           {!isEditing ? (
             <button 
-              onClick={() => setIsEditing(true)}
+              onClick={handleStartEditing}
               className="px-5 py-2.5 bg-white/20 hover:bg-white/30 text-white rounded-full font-bold backdrop-blur-sm transition-all flex items-center gap-2 self-start sm:self-auto border border-white/30"
             >
               <FiEdit2 className="w-4 h-4" /> Edit Profil
