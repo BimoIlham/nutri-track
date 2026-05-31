@@ -105,14 +105,14 @@ export default function Footer() {
         <div className="mt-10 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-emerald-50/60 md:flex-row md:items-center md:justify-between">
           <p>Copyright {year} NutriTrack. Semua hak cipta dilindungi.</p>
           <div className="flex flex-wrap items-center gap-4">
-            <span className="inline-flex items-center gap-2">
+            {/* <span className="inline-flex items-center gap-2">
               <FiClock className="h-4 w-4 text-emerald-300" />
               Backend lokal aktif
             </span>
             <span className="inline-flex items-center gap-2">
               <FiUser className="h-4 w-4 text-emerald-300" />
               Pemantauan personal
-            </span>
+            </span> */}
           </div>
         </div>
       </div>
