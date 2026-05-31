@@ -46,18 +46,18 @@ export function AuthProvider({ children }) {
       setUser(data.user);
       return data.user;
     } catch (error) {
-      const msg = error.response?.data?.message || 'Login gagal. Periksa email dan password.';
+      const code = error.response?.data?.message;
+      let msg;
+      if (code === 'EMAIL_NOT_FOUND') msg = 'Email Anda tidak terdaftar.';
+      else if (code === 'INVALID_PASSWORD') msg = 'Password Anda salah.';
+      else msg = code || 'Login gagal. Periksa email dan password.';
       throw new Error(msg, { cause: error });
     }
   }, []);
 
   const register = useCallback(async (formData) => {
     try {
-      const { data } = await api.post('/auth/register', formData);
-      localStorage.setItem('nutritrack_token', data.token);
-      localStorage.setItem('nutritrack_user', JSON.stringify(data.user));
-      setUser(data.user);
-      return data.user;
+      await api.post('/auth/register', formData);
     } catch (error) {
       const msg = error.response?.data?.message || 'Registrasi gagal. Coba lagi.';
       throw new Error(msg, { cause: error });
