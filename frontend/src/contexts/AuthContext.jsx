@@ -64,10 +64,16 @@ export function AuthProvider({ children }) {
     }
   }, []);
 
-  const logout = useCallback(() => {
-    localStorage.removeItem('nutritrack_token');
-    localStorage.removeItem('nutritrack_user');
-    setUser(null);
+  const logout = useCallback(async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch {
+      // Tetap lanjut logout meski request gagal
+    } finally {
+      localStorage.removeItem('nutritrack_token');
+      localStorage.removeItem('nutritrack_user');
+      setUser(null);
+    }
   }, []);
 
   const updateProfile = useCallback(async (updatedData) => {

@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 const authRoutes = require('./src/routes/authRoutes');
 const profileRoutes = require('./src/routes/profileRoutes');
@@ -11,11 +12,13 @@ const errorHandler = require('./src/middleware/errorHandler');
 const app = express();
 const port = process.env.PORT || 3001;
 
-// Mengizinkan akses dari domain frontend (Vite)
+// Mengizinkan akses dari domain frontend dengan credentials (cookie)
 app.use(cors({
-  origin: 'http://localhost:5173', 
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true,
 }));
-app.use(express.json()); 
+app.use(express.json());
+app.use(cookieParser()); 
 
 // Memetakan endpoint API ke fungsi controller yang sesuai
 app.use('/api/auth', authRoutes);
