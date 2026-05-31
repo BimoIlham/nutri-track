@@ -1,30 +1,29 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const prisma = require('../config/database');
+
+function hashToken(token) {
+  return crypto.createHash('sha256').update(token).digest('hex');
+}
+
+const REFRESH_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 hari
 
 // Fungsi untuk menangani pendaftaran user baru (Register)
 const register = async (req, res, next) => {
   try {
     const { name, email, password, age, gender, weight, height } = req.body;
 
-    // 1. Validasi input: Memastikan name, email, dan password telah diisi
     if (!name || !email || !password) {
       return res.status(400).json({ message: 'Name, email, and password are required' });
     }
 
-    // 2. Cek duplikasi: Memastikan email belum terdaftar di database
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
-
+    const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
       return res.status(400).json({ message: 'Email already registered' });
     }
 
-    // 3. Hash Password: Mengamankan password sebelum disimpan
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 4. Simpan User: Membuat record baru di database menggunakan Prisma
     const user = await prisma.user.create({
       data: {
         name,
@@ -37,20 +36,9 @@ const register = async (req, res, next) => {
       },
     });
 
-    // 5. Generate Token: Membuat token JWT untuk sesi login otomatis setelah register
-    const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    });
-
-    // 6. Response: Menghapus password dari data yang dikirim balik ke client
     const { password: _, ...userWithoutPassword } = user;
-
-    res.status(201).json({
-      token,
-      user: userWithoutPassword,
-    });
+    res.status(201).json({ user: userWithoutPassword });
   } catch (error) {
-    // Melemparkan error ke global error handler
     next(error);
   }
 };
@@ -60,90 +48,132 @@ const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    // 1. Validasi input
     if (!email || !password) {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    // 2. Cari User: Mencari user di database berdasarkan email
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
+    const user = await prisma.user.findUnique({ where: { email } });
 
-    // Jika user tidak ditemukan
+    // Pesan generik untuk mencegah user enumeration
     if (!user) {
-      return res.status(401).json({ message: 'EMAIL_NOT_FOUND' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // 3. Verifikasi Password: Membandingkan password input dengan password hash di database
     const isPasswordValid = await bcrypt.compare(password, user.password);
-
     if (!isPasswordValid) {
-      return res.status(401).json({ message: 'INVALID_PASSWORD' });
+      return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // 4. Generate Token: access token + refresh token
     const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN,
     });
 
-    const refreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET, {
+    const refreshTokenValue = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET, {
       expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
     });
 
-    // 5. Simpan refresh token di httpOnly cookie (tidak bisa diakses JS)
-    res.cookie('refreshToken', refreshToken, {
+    // Simpan hash refresh token di database untuk server-side revocation
+    await prisma.refreshToken.create({
+      data: {
+        hashedToken: hashToken(refreshTokenValue),
+        userId: user.id,
+        expiresAt: new Date(Date.now() + REFRESH_MAX_AGE_MS),
+      },
+    });
+
+    res.cookie('refreshToken', refreshTokenValue, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 hari
+      sameSite: 'lax',
+      maxAge: REFRESH_MAX_AGE_MS,
     });
 
-    // 6. Response: Kirim access token dan data user (tanpa password)
     const { password: _, ...userWithoutPassword } = user;
-
-    res.status(200).json({
-      token,
-      user: userWithoutPassword,
-    });
+    res.status(200).json({ token, user: userWithoutPassword });
   } catch (error) {
     next(error);
   }
 };
 
 // Fungsi untuk memperbarui access token menggunakan refresh token dari cookie
-const refreshToken = async (req, res) => {
+const refreshToken = async (req, res, next) => {
   const token = req.cookies?.refreshToken;
 
   if (!token) {
     return res.status(401).json({ message: 'Refresh token tidak ditemukan' });
   }
 
+  // Pisahkan error JWT dari error database
+  let decoded;
   try {
-    const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
-
-    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
-    if (!user) {
-      return res.status(401).json({ message: 'User tidak ditemukan' });
-    }
-
-    const newAccessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN,
-    });
-
-    res.json({ token: newAccessToken });
+    decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
   } catch {
     res.clearCookie('refreshToken');
     return res.status(401).json({ message: 'Refresh token tidak valid atau sudah expired' });
   }
+
+  try {
+    const hashed = hashToken(token);
+    const storedToken = await prisma.refreshToken.findUnique({ where: { hashedToken: hashed } });
+
+    // Token valid secara JWT tapi sudah di-revoke atau expired di sisi server
+    if (!storedToken || storedToken.expiresAt < new Date()) {
+      res.clearCookie('refreshToken');
+      return res.status(401).json({ message: 'Refresh token sudah tidak valid' });
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+    if (!user) {
+      await prisma.refreshToken.deleteMany({ where: { hashedToken: hashed } });
+      res.clearCookie('refreshToken');
+      return res.status(401).json({ message: 'User tidak ditemukan' });
+    }
+
+    // Rotasi token: generate pair baru, hapus yang lama
+    const newAccessToken = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN,
+    });
+    const newRefreshToken = jwt.sign({ id: user.id }, process.env.REFRESH_TOKEN_SECRET, {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN,
+    });
+
+    await prisma.refreshToken.update({
+      where: { hashedToken: hashed },
+      data: {
+        hashedToken: hashToken(newRefreshToken),
+        expiresAt: new Date(Date.now() + REFRESH_MAX_AGE_MS),
+      },
+    });
+
+    res.cookie('refreshToken', newRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: REFRESH_MAX_AGE_MS,
+    });
+
+    res.json({ token: newAccessToken });
+  } catch (error) {
+    next(error);
+  }
 };
 
-// Fungsi untuk logout — hapus refresh token cookie
-const logout = (req, res) => {
+// Fungsi untuk logout — hapus refresh token dari DB dan cookie
+const logout = async (req, res, next) => {
+  const token = req.cookies?.refreshToken;
+
+  if (token) {
+    try {
+      await prisma.refreshToken.deleteMany({ where: { hashedToken: hashToken(token) } });
+    } catch (error) {
+      return next(error);
+    }
+  }
+
   res.clearCookie('refreshToken', {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'strict',
+    sameSite: 'lax',
   });
   res.json({ message: 'Logout berhasil' });
 };

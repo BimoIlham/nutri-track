@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import api from '../services/api';
 import { AuthContext } from './auth-context';
 
@@ -25,6 +25,13 @@ export function AuthProvider({ children }) {
   const isAuthenticated = !!user;
   const loading = false;
 
+  // Reset React state saat axios interceptor paksa logout (refresh token expired)
+  useEffect(() => {
+    const handleForcedLogout = () => setUser(null);
+    window.addEventListener('auth:logout', handleForcedLogout);
+    return () => window.removeEventListener('auth:logout', handleForcedLogout);
+  }, []);
+
   const fetchProfile = useCallback(async () => {
     try {
       const { data } = await api.get('/auth/profile');
@@ -46,11 +53,10 @@ export function AuthProvider({ children }) {
       setUser(data.user);
       return data.user;
     } catch (error) {
-      const code = error.response?.data?.message;
-      let msg;
-      if (code === 'EMAIL_NOT_FOUND') msg = 'Email Anda tidak terdaftar.';
-      else if (code === 'INVALID_PASSWORD') msg = 'Password Anda salah.';
-      else msg = code || 'Login gagal. Periksa email dan password.';
+      const serverMsg = error.response?.data?.message;
+      const msg = serverMsg === 'Invalid email or password'
+        ? 'Email atau password salah.'
+        : serverMsg || 'Login gagal. Periksa email dan password.';
       throw new Error(msg, { cause: error });
     }
   }, []);
