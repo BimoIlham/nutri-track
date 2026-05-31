@@ -57,9 +57,9 @@ export default function Register() {
         height: Number(formData.height),
       };
       await register(payload);
-      navigate('/');
-    } catch (err) { 
-      setGlobalError(err.message); 
+      navigate('/login');
+    } catch (err) {
+      setGlobalError(err.message);
       setIsAlertOpen(true);
     }
     finally { setLoading(false); }
@@ -67,12 +67,12 @@ export default function Register() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-emerald-50 via-[#F6FCFA] to-teal-50">
-      <AlertModal 
-        isOpen={isAlertOpen} 
-        onClose={() => setIsAlertOpen(false)} 
-        title="Pendaftaran Gagal" 
-        message={globalError} 
-        type="error" 
+      <AlertModal
+        isOpen={isAlertOpen}
+        onClose={() => setIsAlertOpen(false)}
+        title="Pendaftaran Gagal"
+        message={globalError}
+        type="error"
       />
 
       <div className="absolute inset-0 overflow-hidden pointer-events-none">

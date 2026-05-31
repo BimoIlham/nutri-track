@@ -72,14 +72,14 @@ const login = async (req, res, next) => {
 
     // Jika user tidak ditemukan
     if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'EMAIL_NOT_FOUND' });
     }
 
     // 3. Verifikasi Password: Membandingkan password input dengan password hash di database
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(401).json({ message: 'Invalid email or password' });
+      return res.status(401).json({ message: 'INVALID_PASSWORD' });
     }
 
     // 4. Generate Token: Membuat token JWT untuk autentikasi selanjutnya

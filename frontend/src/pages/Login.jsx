@@ -17,6 +17,8 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [alertType, setAlertType] = useState('error');
+  const [alertTitle, setAlertTitle] = useState('Login Gagal');
   const [loading, setLoading] = useState(false);
 
   const validate = () => {
@@ -40,8 +42,13 @@ export default function Login() {
     setLoading(true);
     try {
       await login(email, password);
-      navigate('/');
+      setAlertType('success');
+      setAlertTitle('Login Berhasil');
+      setError('Selamat datang kembali! Kamu akan diarahkan ke halaman utama.');
+      setIsAlertOpen(true);
     } catch (err) {
+      setAlertType('error');
+      setAlertTitle('Login Gagal');
       setError(err.message);
       setIsAlertOpen(true);
     } finally {
@@ -51,12 +58,15 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gradient-to-br from-emerald-50 via-[#F6FCFA] to-teal-50">
-      <AlertModal 
-        isOpen={isAlertOpen} 
-        onClose={() => setIsAlertOpen(false)} 
-        title="Login Gagal" 
-        message={error} 
-        type="error" 
+      <AlertModal
+        isOpen={isAlertOpen}
+        onClose={() => {
+          setIsAlertOpen(false);
+          if (alertType === 'success') navigate('/');
+        }}
+        title={alertTitle}
+        message={error}
+        type={alertType}
       />
 
       {/* Background decorations */}
