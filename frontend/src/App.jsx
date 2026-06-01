@@ -8,6 +8,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import CheckObesity from './pages/CheckObesity';
+import NotFound from './pages/NotFound';
 
 /**
  * App — root component with routing and auth provider.
@@ -41,6 +42,7 @@ export default function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </main>
 
