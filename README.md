@@ -403,13 +403,16 @@ Project ini dikembangkan oleh tim **Capstone DBS Foundation Coding Camp 2025**.
 
 | Nama | Role |
 |------|------|
-| Bimo Ilham | Backend Developer |
+| Bimo Ilham Heryansah | Frontend Developer |
 | Dika Ramadhani | Backend Developer |
-| Tim ML | Machine Learning Engineer |
+| Muhammad Syahid Nashrul Aziz | Data Scientist |
+| Okta Nuzulifa | Data Scientist |
+| Luiz Yosef Martua Raffles Nainggolan | AI Engineer |
+| Halim Elsa Putra | AI Engineer |
 
 ## 📄 Lisensi
 
-Project ini dikembangkan untuk keperluan edukasi sebagai bagian dari **DBS Foundation Coding Camp 2025**.
+Project ini dikembangkan untuk keperluan Capstone sebagai bagian dari **DBS Foundation Coding Camp 2025**.
 
 ---
 
