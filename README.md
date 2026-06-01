@@ -172,7 +172,7 @@ Pastikan software berikut sudah terinstall di komputer Anda:
 
 - **Node.js** v18 atau lebih baru — [Download](https://nodejs.org/)
 - **npm** v9 atau lebih baru (biasanya sudah termasuk dengan Node.js)
-- **PostgreSQL** v15+ atau **Docker** — [Download PostgreSQL](https://www.postgresql.org/download/) | [Download Docker](https://www.docker.com/)
+- **PostgreSQL** v15+ — [Download](https://www.postgresql.org/download/)
 - **Git** — [Download](https://git-scm.com/)
 
 ### 1. Clone Repository
@@ -184,24 +184,10 @@ cd nutri-track
 
 ### 2. Setup Database
 
-**Opsi A — Menggunakan Docker (Direkomendasikan)**
-
-```bash
-docker run -d \
-  --name nutri-track-db \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=postgres \
-  -e POSTGRES_DB=nutritrack \
-  -p 5433:5432 \
-  postgres:17
-```
-
-**Opsi B — PostgreSQL Lokal**
-
-Buat database baru bernama `nutritrack` melalui `psql` atau pgAdmin:
+Pastikan PostgreSQL sudah berjalan, lalu buat database baru melalui `psql` atau pgAdmin:
 
 ```sql
-CREATE DATABASE nutritrack;
+CREATE DATABASE nutritrack_local;
 ```
 
 ### 3. Setup Backend
@@ -211,24 +197,22 @@ cd backend
 
 # Install dependencies
 npm install
-
-# Buat file environment
-cp .env.example .env
-# Atau buat manual:
 ```
 
 Buat file `backend/.env` dengan isi berikut:
 
 ```env
-DATABASE_URL="postgresql://postgres:postgres@localhost:5433/nutritrack"
+PORT=3001
+DATABASE_URL="postgresql://postgres:<password>@localhost:5432/nutritrack_local"
 JWT_SECRET="your-secret-key-here"
-JWT_REFRESH_SECRET="your-refresh-secret-key-here"
+JWT_EXPIRES_IN=1h
+REFRESH_TOKEN_SECRET="your-refresh-secret-key-here"
+REFRESH_TOKEN_EXPIRES_IN=7d
 CLIENT_URL="http://localhost:5173"
 ML_API_URL="<url-ml-api-dari-tim>"
-PORT=3001
 ```
 
-> **Catatan:** Sesuaikan `DATABASE_URL` dengan konfigurasi PostgreSQL Anda. Jika menggunakan PostgreSQL lokal (bukan Docker), port default biasanya `5432`.
+> **Catatan:** Sesuaikan `<password>`, username, dan nama database pada `DATABASE_URL` dengan konfigurasi PostgreSQL lokal Anda.
 
 ```bash
 # Jalankan migrasi database
@@ -418,4 +402,3 @@ Project ini dikembangkan untuk keperluan Capstone sebagai bagian dari **DBS Foun
 
 <p align="center">
   Dibuat dengan ❤️ oleh Tim NutriTrack — DBS Foundation Coding Camp 2025
-</p>
