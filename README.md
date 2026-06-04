@@ -32,7 +32,7 @@
 
 ## 📋 Tentang Project
 
-**NutriTrack** adalah aplikasi web yang memanfaatkan teknologi **Machine Learning** untuk memprediksi tingkat obesitas pengguna berdasarkan data fisik dan kebiasaan sehari-hari. Aplikasi ini dikembangkan sebagai **Capstone Project DBS Foundation Coding Camp 2025**.
+**NutriTrack** adalah aplikasi web yang memanfaatkan teknologi **Machine Learning** untuk memprediksi tingkat obesitas pengguna berdasarkan data fisik dan kebiasaan sehari-hari. Aplikasi ini dikembangkan sebagai **Capstone Project DBS Foundation Coding Camp 2026**.
 
 Pengguna cukup mengisi formulir dengan data seperti usia, tinggi badan, berat badan, frekuensi konsumsi sayur, aktivitas fisik, dan lainnya. Sistem kemudian menganalisis data tersebut menggunakan model ML dan memberikan:
 
@@ -383,7 +383,7 @@ npm run lint     # Jalankan ESLint
 
 ## 🤝 Tim Pengembang
 
-Project ini dikembangkan oleh tim **Capstone DBS Foundation Coding Camp 2025**.
+Project ini dikembangkan oleh tim **Capstone DBS Foundation Coding Camp 2026**.
 
 | Nama | Role |
 |------|------|
@@ -396,9 +396,10 @@ Project ini dikembangkan oleh tim **Capstone DBS Foundation Coding Camp 2025**.
 
 ## 📄 Lisensi
 
-Project ini dikembangkan untuk keperluan Capstone sebagai bagian dari **DBS Foundation Coding Camp 2025**.
+Project ini dikembangkan untuk keperluan Capstone sebagai bagian dari **DBS Foundation Coding Camp 2026**.
 
 ---
 
 <p align="center">
-  Dibuat dengan ❤️ oleh Tim NutriTrack — DBS Foundation Coding Camp 2025
+  Dibuat dengan ❤️ oleh Tim NutriTrack — DBS Foundation Coding Camp 2026
+
